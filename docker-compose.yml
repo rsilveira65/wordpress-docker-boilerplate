@@ -1,0 +1,30 @@
+version: "2"
+
+services:
+  database:
+    expose:
+      - "3306"
+    image: mysql:5.7
+    container_name: database
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./docker/database/data:/var/lib/mysql
+      - ./docker/database/dumps:/dumps
+    env_file:
+      - ./.env
+
+  application:
+    build:
+      context: ./application
+      args:
+        UID: ${UID}
+    image: application
+    container_name: application
+    env_file:
+      - ./.env
+    volumes:
+      - ./application:/var/www/html
+      - ./docker/volumes/uploads:/var/www/html/wp-content/uploads
+    ports:
+      - "80:80"

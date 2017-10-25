@@ -1,0 +1,39 @@
+version: "2"
+
+services:
+  database:
+    image: mysql:5.7
+    expose:
+     - "3306"
+    container_name: database
+    volumes:
+      - ./docker/database/data:/var/lib/mysql
+      - ./docker/database/dumps:/dumps
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: always
+    ports:
+      - "3306:3306"
+
+  application:
+    build:
+      context: ./application
+      args:
+        UID: ${UID}
+    image: vsea-application-image
+    container_name: vsea-application
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_HOST: ${MYSQL_HOST}
+      DEBUG: ${DEBUG}
+    restart: always
+    volumes:
+      - ./docker/volumes/uploads:/var/www/html/wp-content/uploads
+    ports:
+      - "80:80"
